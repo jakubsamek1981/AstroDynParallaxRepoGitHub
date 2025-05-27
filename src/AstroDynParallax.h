@@ -30,7 +30,6 @@ typedef struct {
 } DynParallaxResults;
 
 // Functions prototype
-//float accuracy_calculation (float m1, float m2, float m1_prev, float m2_prev);
 float accuracy_calculation (float m, float m_prev);
 void print_output (DynParallaxResults dyn_params);
 DynParallaxResults calc_dyn_parallax (DynParallaxResults dyn_params);

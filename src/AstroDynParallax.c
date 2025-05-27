@@ -2,13 +2,14 @@
  ============================================================================
  Name        : AstroDynParallax.c
  Author      : Jakub Samek
- Version     : 4.0
+ Version     : 5.0
  Copyright   : Your copyright notice
  Description : Program calculate Binary star parameters with specified accuracy
                - input type and range check
                - structure reorder (.h file)
                - temp_converg function introduction shows correctness of while cycle
                - print_output function introduction
+               - comments corrections
  ============================================================================
  */
 
@@ -18,31 +19,25 @@
 
 #include "AstroDynParallax.h"
 
-float accuracy = 2.0;
+float accuracy;
 
 int main(void) {
 
   float h;
-  float m1;
-  float m2;
   float accuracy_threshold;
   float area_part;
   float area_full;
   float time_cycle;
   float a_au;
-  float a_degrees;
-  float a_radians;
   DynParallaxResults dyn_params;
 
   float time_observation = 11;
-
-  float m1_prev = 1;
-  float m2_prev = 1;
-
   float a = 4.5;
   float b = 3.4;
 
-  printf("The mass of the Sun is approximately %.3e kg.\n", CONST_SUN_MASS);
+  printf("CONST_SUN_MASS = %.3e[kg] \n", CONST_SUN_MASS);
+  printf("CONST_SUN_MAGNITUDE = %f \n", CONST_SUN_MAGNITUDE);
+  printf("CONST_SUN_LUMINOSITY = %.3e[W] \n", CONST_SUN_LUMINOSITY);
 
   h = sqrt(pow(a, 2) - pow(b, 2));
   printf("Eccentricity: %.4f\n", h);
@@ -55,18 +50,19 @@ int main(void) {
   area_full = a*b*M_PI;
   printf("Area full: %.4f\n", area_full);
 
-  // Compute area full
+  // Compute cycle time
   time_cycle = time_observation*area_full/area_part;
-  printf("Time of one cycle: %.4f\n", time_cycle);
+  printf("Time of one cycle: %.4f[years]\n", time_cycle);
 
   // Compute semi-major-axis
   a_au = pow((2*pow(time_cycle, 2)), (1.0/3.0));
-  printf("a_au: %.4f [au]\n", a_au);
+  printf("a_au: %.4f[au]\n", a_au);
 
   printf("Enter a accuracy threshold in range (0.01 - 100.0): ");
   // Checking if the input is a valid floating-point number
   if (scanf("%f", &accuracy_threshold) == 1) {
-    if (accuracy_threshold >= 0.01 && accuracy_threshold <= 100.0) {
+	  // Checking if the input is in range 0.01 - 100.0
+    if ((accuracy_threshold >= 0.009) && (accuracy_threshold <= 100.0)) {
   	}
     else
     {
@@ -85,29 +81,32 @@ int main(void) {
   dyn_params.time_cycle = time_cycle;
   dyn_params.mag1_rel = 3.9;
   dyn_params.mag2_rel = 5.3;
+  //precondition mass1 = 1 + mass2 = 1 => mass_summ = 2
   dyn_params.mass_sum = 2;
   dyn_params.itteration = 0;
 
-  dyn_params = calc_dyn_parallax (dyn_params);
+  // first call of function calc_dyn_parallax
+  dyn_params = calc_dyn_parallax(dyn_params);
 
+  // first calculation of accuracy
   accuracy = accuracy_calculation (dyn_params.mass_sum, dyn_params.mass_sum_prev);
-  printf("Accuracy calc: %lf\n", accuracy);
+  printf("Accuracy calc: %lf[%]\n", accuracy);
 
+  //
   while (accuracy >= accuracy_threshold) {
 
     dyn_params = calc_dyn_parallax (dyn_params);
 
     accuracy = accuracy_calculation (dyn_params.mass_sum, dyn_params.mass_sum_prev);
-    printf("Accuracy = %f\n", accuracy);
+    printf("Accuracy = %f[%]\n", accuracy);
 
   }
 
-  printf("Accuracy %f achieved in Iterations %d \n", accuracy, dyn_params.itteration);
+  printf("Accuracy %f[%] achieved in Iterations %d \n", accuracy, dyn_params.itteration);
 
   return 0;
 }
 
-//float accuracy_calculation (float m1, float m2, float m1_prev, float m2_prev)
 float accuracy_calculation (float m, float m_prev)
 {
 	float accuracy;
@@ -155,6 +154,6 @@ DynParallaxResults calc_dyn_parallax (DynParallaxResults dyn_params)
 void print_output (DynParallaxResults dyn_params)
 {
   printf("----------------------------------------------------------------------------------------- \n");
-  printf("iteration = %i; a_au = %f[au]; distance = %f[pc]; mag1_abs = %.4f; mag2_abs = %.4f; mass1 = %.4e; mass2 = %.4e; \n", dyn_params.itteration, dyn_params.a_au, dyn_params.distance_pc, dyn_params.mag1_abs, dyn_params.mag2_abs, dyn_params.mass1, dyn_params.mass2);
+  printf("iteration = %i; a_au = %f[au]; distance = %f[pc]; mag1_abs = %.4f; mag2_abs = %.4f; mass1 = %.4e[kg]; mass2 = %.4e[kg]; \n", dyn_params.itteration, dyn_params.a_au, dyn_params.distance_pc, dyn_params.mag1_abs, dyn_params.mag2_abs, dyn_params.mass1, dyn_params.mass2);
 }
 
